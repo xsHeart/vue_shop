@@ -64,9 +64,9 @@
           <!-- 作用域插槽，scope接收所有数据 -->
           <template slot-scope="scope">
             <!-- 按钮图标 -->
-            <el-button size="mini" type="primary" icon="el-icon-edit">编辑</el-button>
+            <el-button size="mini" type="primary" icon="el-icon-edit" @click="xiugai(scope.row.id)">编辑</el-button>
             <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
-            <el-button size="mini" type="warning" icon="el-icon-setting" @click="showSetRightDialog(scope.row)">分配权限</el-button>
+            <el-button size="mini" type="warning" icon="el-icon-setting" @click="showSetRightDialog(scope.row.id)">分配权限</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -83,6 +83,22 @@
       <el-button @click="setRightDialogVisible = false">取 消</el-button>
     <el-button type="primary" @click="allotRights">确 定</el-button>
     </span>
+    </el-dialog>
+    <!-- 修改表单对话框 -->
+    <el-dialog
+      title="修改用户"
+      :visible.sync="xiugaiDialogVisible"
+      width="50%">
+      <!-- 表单 -->
+      <!-- <el-form ref="form" :model="form" label-width="80px">
+        <el-form-item label="活动名称">
+          <el-input v-model="form.name"></el-input>
+        </el-form-item>
+      </el-form>> -->
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="xiugaiDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="xiugaiDialogVisible = false">确 定</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -104,7 +120,9 @@ export default {
       // 默认选中的节点ID值数组
       defKeys: [],
       // 当前即将分配权限的角色ID
-      roleId: ''
+      roleId: '',
+      // 修改用户信息对话框
+      xiugaiDialogVisible: false
     }
   },
   // 声明周期函数，在里面获取所有角色的列表数据
@@ -194,6 +212,14 @@ export default {
       this.getRolesList()
       // 隐藏对话框
       this.setRightDialogVisible = false
+    },
+    async xiugai (id) {
+      // console.log(id)
+      const { data: res } = await this.$http.get('roles/' + id)
+      if (res.meta.status !== 200) {
+        return this.$message.error('查询用户失败！')
+      }
+      this.xiugaiDialogVisible = true
     }
   }
 }
